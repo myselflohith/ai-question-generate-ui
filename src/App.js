@@ -77,14 +77,14 @@ export default function ChapterViewer() {
 
   return (
     <div className="card-wrapper">
-      <div className="card">
+      <div className="card glass">
         <div className={`card-content ${generating ? 'blur' : ''}`}>
         {/* Subject Tabs */}
         <div className="tabs">
           {subjects.map((subj, i) => (
             <div
               key={i}
-              className={`tab ${i === activeSubject ? 'active' : ''}`}
+              className={`tab glass ${i === activeSubject ? 'active' : ''}`}
               onClick={() => {
                 setActiveSubject(i);
                 setPucs([]);
@@ -138,7 +138,7 @@ export default function ChapterViewer() {
             {['1st PUC', '2nd PUC'].map((val, i) => (
               <div
                 key={i}
-                className={`puc-button ${pucs.includes(i) ? 'active' : ''}`}
+                className={`puc-button glass ${pucs.includes(i) ? 'active' : ''}`}
                 onClick={() => {
                   setPucs((prev) =>
                     prev.includes(i)
@@ -157,7 +157,7 @@ export default function ChapterViewer() {
         {/* Chapter Accordion */}
         <div className={`chapter-container ${pucs.length > 0 ? 'show' : ''}`}>
           {chapters.map((ch, idx) => (
-            <div className="chapter" key={idx}>
+            <div className="chapter glass" key={idx}>
               <div
                 className="chapter-header"
                 onClick={() => setOpenChapter(openChapter === idx ? null : idx)}
@@ -170,7 +170,7 @@ export default function ChapterViewer() {
                     <span>{topic}</span>
                     <input
                       type="number"
-                      className="topic-input"
+                      className="topic-input glass"
                       min="0"
                       max={TOTAL_QUESTIONS}
                       value={
@@ -190,7 +190,7 @@ export default function ChapterViewer() {
         </div>
         {canGenerate && (
           <button
-            className="ai-generate-btn"
+            className="ai-generate-btn glass"
             onClick={handleGenerate}
             disabled={generating}
           >
