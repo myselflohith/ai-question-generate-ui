@@ -74,6 +74,7 @@ body {
       backdrop-filter: blur(10px);
     }
 
+    .difficulty-container,
     .puc-container,
     .chapter-container {
       max-height: 0;
@@ -83,6 +84,7 @@ body {
       transition: all 0.7s ease-in-out;
     }
 
+    .difficulty-container.show,
     .puc-container.show,
     .chapter-container.show {
       max-height: 1000px;
@@ -253,11 +255,11 @@ body {
   pointer-events: none;
 }
 
-.sparkle-overlay svg {
+.sparkle-overlay .sparkle-icon {
   width: 48px;
   height: 48px;
   animation: sparkle 1s infinite alternate;
-  fill: #fff;
+  color: #fff;
 }
 
 @keyframes sparkle {

@@ -19,17 +19,10 @@ const chapters = [
 
 const TOTAL_QUESTIONS = 10;
 
-const Sparkle = ({ className, size = 48 }) => (
-  <svg
-    className={className}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M12 2l2.09 6.26L20 9.27l-5 3.64L16.18 20 12 16.9 7.82 20 9 12.91 4 9.27l5.91-1.01L12 2z" />
-  </svg>
+const SparkleIcon = ({ className = '', size = 48 }) => (
+  <span className={`material-icons ${className}`} style={{ fontSize: size }}>
+    auto_awesome
+  </span>
 );
 
 export default function ChapterViewer() {
@@ -76,16 +69,11 @@ export default function ChapterViewer() {
     });
   };
 
-  const totalCount =
-    activeSubject !== null
-      ? topicCounts[activeSubject].reduce(
-          (sum, ch) => sum + ch.reduce((s, t) => s + t, 0),
-          0
-        )
-      : 0;
+  const subjectTotals = topicCounts.map((subj) =>
+    subj.reduce((sum, ch) => sum + ch.reduce((s, t) => s + t, 0), 0)
+  );
 
-  const canGenerate =
-    activeSubject !== null && totalCount === TOTAL_QUESTIONS;
+  const canGenerate = subjectTotals.every((total) => total === TOTAL_QUESTIONS);
 
   return (
     <div className="card-wrapper">
@@ -110,8 +98,11 @@ export default function ChapterViewer() {
         </div>
 
         {/* Difficulty Slider */}
-        {activeSubject !== null && (
-        <div id="difficulty-container" style={{ display: 'block' }}>
+        <div
+          className={`difficulty-container ${
+            activeSubject !== null ? 'show' : ''
+          }`}
+        >
           <div className="label-row">
             <span>Hard</span>
             <span>Medium</span>
@@ -140,7 +131,6 @@ export default function ChapterViewer() {
           </div>
           <div className="values">{getSliderValues()}</div>
         </div>
-        )}
 
         {/* PUC Selection */}
         <div className={`puc-container ${showPUC ? 'show' : ''}`}>
@@ -200,13 +190,13 @@ export default function ChapterViewer() {
             onClick={handleGenerate}
             disabled={generating}
           >
-            <Sparkle className="btn-icon" size={20} /> AI Generate
+            <SparkleIcon className="btn-icon" size={20} /> AI Generate
           </button>
         )}
       </div>
       {generating && (
         <div className="sparkle-overlay">
-          <Sparkle />
+          <SparkleIcon className="sparkle-icon" size={48} />
         </div>
       )}
     </div>
