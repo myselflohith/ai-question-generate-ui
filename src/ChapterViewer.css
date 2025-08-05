@@ -45,7 +45,7 @@ body {
       padding: 32px;
       position: relative;
       z-index: 1;
-      color: #fff;
+      color: #000;
     }
 
     .tabs, .puc-buttons {
@@ -141,7 +141,7 @@ body {
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.3);
   background: rgba(255,255,255,0.15);
-  color: #fff;
+  color: #000;
   font-size: 14px;
   text-align: center;
   backdrop-filter: blur(10px);
@@ -149,7 +149,7 @@ body {
 }
 
 .topic-input::placeholder {
-  color: rgba(255,255,255,0.5);
+  color: rgba(0,0,0,0.5);
 }
 
 
@@ -162,7 +162,7 @@ body {
       display: flex;
       justify-content: space-between;
       font-weight: 500;
-      color: #fff;
+      color: #000;
       font-size: 14px;
       margin-top: 20px;
     }
@@ -217,7 +217,7 @@ body {
       text-align: center;
       font-size: 14px;
       font-weight: bold;
-      color: #fff;
+      color: #000;
       margin-top: 10px;
     }
 
@@ -227,17 +227,17 @@ body {
 }
 
 .ai-generate-btn {
-  margin-top: 20px;
-  width: 100%;
-  padding: 10px 16px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #000;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
 
 .ai-generate-btn:hover {
   background: rgba(255, 255, 255, 0.2);

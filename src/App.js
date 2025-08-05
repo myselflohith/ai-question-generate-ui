@@ -135,23 +135,27 @@ export default function ChapterViewer() {
         {/* PUC Selection */}
         <div className={`puc-container ${showPUC ? 'show' : ''}`}>
           <div className="puc-buttons">
-            {['1st PUC', '2nd PUC'].map((val, i) => (
-              <div
-                key={i}
-                className={`puc-button ${pucs.includes(i) ? 'active' : ''}`}
-                onClick={() => {
-                  setPucs((prev) =>
-                    prev.includes(i)
-                      ? prev.filter((idx) => idx !== i)
-                      : [...prev, i]
-                  );
-                  setOpenChapter(null);
-                }}
-              >
-                {val}
-              </div>
-            ))}
-          </div>
+              {['1st PUC', '2nd PUC'].map((val, i) => (
+                <div
+                  key={i}
+                  className={`puc-button ${pucs.includes(i) ? 'active' : ''}`}
+                  onClick={() => {
+                    setPucs((prev) => {
+                      const isActive = prev.includes(i);
+                      const updated = isActive
+                        ? prev.filter((idx) => idx !== i)
+                        : [...prev, i];
+                      if (i === 0) {
+                        setOpenChapter(isActive ? null : 0);
+                      }
+                      return updated;
+                    });
+                  }}
+                >
+                  {val}
+                </div>
+              ))}
+            </div>
         </div>
 
         {/* Chapter Accordion */}

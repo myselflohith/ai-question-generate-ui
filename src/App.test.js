@@ -26,3 +26,11 @@ test('allows selecting both PUC options', () => {
   expect(first.classList.contains('active')).toBe(true);
   expect(second.classList.contains('active')).toBe(true);
 });
+
+test('selecting 1st PUC opens first chapter by default', () => {
+  render(<App />);
+  fireEvent.click(screen.getByText('Physics'));
+  fireEvent.click(screen.getByText('1st PUC'));
+  const topics = screen.getByText('Motion and Laws').nextElementSibling;
+  expect(topics.classList.contains('show')).toBe(true);
+});
