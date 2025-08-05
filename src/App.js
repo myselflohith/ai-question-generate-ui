@@ -17,14 +17,33 @@ const chapters = [
   }
 ];
 
+const TOTAL_QUESTIONS = 10;
+
+const Sparkle = ({ className, size = 48 }) => (
+  <svg
+    className={className}
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M12 2l2.09 6.26L20 9.27l-5 3.64L16.18 20 12 16.9 7.82 20 9 12.91 4 9.27l5.91-1.01L12 2z" />
+  </svg>
+);
+
 export default function ChapterViewer() {
-  const [activeSubject, setActiveSubject] = useState(0);
+  const [activeSubject, setActiveSubject] = useState(null);
   const [puc, setPuc] = useState(null);
   const [openChapter, setOpenChapter] = useState(null);
   const [slider1, setSlider1] = useState(33);
   const [slider2, setSlider2] = useState(66);
   const [showPUC, setShowPUC] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const initialCounts = subjects.map(() =>
+    chapters.map((ch) => ch.topics.map(() => 0))
+  );
+  const [topicCounts, setTopicCounts] = useState(initialCounts);
 
   const handleSliderChange = (index, value) => {
     if (index === 1) {
@@ -47,6 +66,26 @@ export default function ChapterViewer() {
     setGenerating(true);
     setTimeout(() => setGenerating(false), 2000);
   };
+
+  const handleTopicCountChange = (chIdx, topicIdx, value) => {
+    if (activeSubject === null) return;
+    setTopicCounts((prev) => {
+      const copy = prev.map((subj) => subj.map((ch) => [...ch]));
+      copy[activeSubject][chIdx][topicIdx] = value;
+      return copy;
+    });
+  };
+
+  const totalCount =
+    activeSubject !== null
+      ? topicCounts[activeSubject].reduce(
+          (sum, ch) => sum + ch.reduce((s, t) => s + t, 0),
+          0
+        )
+      : 0;
+
+  const canGenerate =
+    activeSubject !== null && totalCount === TOTAL_QUESTIONS;
 
   return (
     <div className="card-wrapper">
@@ -71,6 +110,7 @@ export default function ChapterViewer() {
         </div>
 
         {/* Difficulty Slider */}
+        {activeSubject !== null && (
         <div id="difficulty-container" style={{ display: 'block' }}>
           <div className="label-row">
             <span>Hard</span>
@@ -100,6 +140,7 @@ export default function ChapterViewer() {
           </div>
           <div className="values">{getSliderValues()}</div>
         </div>
+        )}
 
         {/* PUC Selection */}
         <div className={`puc-container ${showPUC ? 'show' : ''}`}>
@@ -137,7 +178,15 @@ export default function ChapterViewer() {
                       type="number"
                       className="topic-input"
                       min="0"
-                      defaultValue={0}
+                      max={TOTAL_QUESTIONS}
+                      value={
+                        activeSubject !== null
+                          ? topicCounts[activeSubject][idx][i]
+                          : 0
+                      }
+                      onChange={(e) =>
+                        handleTopicCountChange(idx, i, +e.target.value)
+                      }
                     />
                   </div>
                 ))}
@@ -145,15 +194,21 @@ export default function ChapterViewer() {
             </div>
           ))}
         </div>
-        <button
-          className="ai-generate-btn"
-          onClick={handleGenerate}
-          disabled={generating}
-        >
-          AI Generate
-        </button>
+        {canGenerate && (
+          <button
+            className="ai-generate-btn"
+            onClick={handleGenerate}
+            disabled={generating}
+          >
+            <Sparkle className="btn-icon" size={20} /> AI Generate
+          </button>
+        )}
       </div>
-      {generating && <div className="sparkle-overlay">✨</div>}
+      {generating && (
+        <div className="sparkle-overlay">
+          <Sparkle />
+        </div>
+      )}
     </div>
   </div>
   );
