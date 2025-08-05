@@ -61,7 +61,7 @@ body {
       color: white;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.4s ease;
       border: 1px solid rgba(255, 255, 255, 0.3);
       font-size: 14px;
     }
@@ -80,7 +80,7 @@ body {
       overflow: hidden;
       opacity: 0;
       transform: translateY(-10px);
-      transition: all 0.5s ease-in-out;
+      transition: all 0.7s ease-in-out;
     }
 
     .puc-container.show,
@@ -114,7 +114,7 @@ body {
       max-height: 0;
       opacity: 0;
       transform: translateY(-10px);
-      transition: all 0.5s ease;
+      transition: all 0.7s ease;
       padding: 0 16px;
     }
 
