@@ -27,7 +27,7 @@ const SparkleIcon = ({ className = '', size = 48 }) => (
 
 export default function ChapterViewer() {
   const [activeSubject, setActiveSubject] = useState(null);
-  const [puc, setPuc] = useState(null);
+  const [pucs, setPucs] = useState([]);
   const [openChapter, setOpenChapter] = useState(null);
   const [slider1, setSlider1] = useState(33);
   const [slider2, setSlider2] = useState(66);
@@ -87,7 +87,7 @@ export default function ChapterViewer() {
               className={`tab ${i === activeSubject ? 'active' : ''}`}
               onClick={() => {
                 setActiveSubject(i);
-                setPuc(null);
+                setPucs([]);
                 setOpenChapter(null);
                 setShowPUC(true);
               }}
@@ -138,9 +138,13 @@ export default function ChapterViewer() {
             {['1st PUC', '2nd PUC'].map((val, i) => (
               <div
                 key={i}
-                className={`puc-button ${puc === i ? 'active' : ''}`}
+                className={`puc-button ${pucs.includes(i) ? 'active' : ''}`}
                 onClick={() => {
-                  setPuc(i);
+                  setPucs((prev) =>
+                    prev.includes(i)
+                      ? prev.filter((idx) => idx !== i)
+                      : [...prev, i]
+                  );
                   setOpenChapter(null);
                 }}
               >
@@ -151,7 +155,7 @@ export default function ChapterViewer() {
         </div>
 
         {/* Chapter Accordion */}
-        <div className={`chapter-container ${puc !== null ? 'show' : ''}`}>
+        <div className={`chapter-container ${pucs.length > 0 ? 'show' : ''}`}>
           {chapters.map((ch, idx) => (
             <div className="chapter" key={idx}>
               <div

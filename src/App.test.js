@@ -15,3 +15,14 @@ test('AI Generate button appears after all subjects reach 10 questions', () => {
   });
   expect(screen.getByText(/AI Generate/i)).toBeInTheDocument();
 });
+
+test('allows selecting both PUC options', () => {
+  render(<App />);
+  fireEvent.click(screen.getByText('Physics'));
+  const first = screen.getByText('1st PUC');
+  const second = screen.getByText('2nd PUC');
+  fireEvent.click(first);
+  fireEvent.click(second);
+  expect(first.classList.contains('active')).toBe(true);
+  expect(second.classList.contains('active')).toBe(true);
+});
