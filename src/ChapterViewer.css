@@ -211,10 +211,53 @@ body {
       z-index: 0;
     }
 
-    .values {
+.values {
       text-align: center;
       font-size: 14px;
       font-weight: bold;
       color: #fff;
       margin-top: 10px;
     }
+
+.card-content.blur {
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.ai-generate-btn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ai-generate-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sparkle-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  pointer-events: none;
+  animation: sparkle 1s infinite alternate;
+}
+
+@keyframes sparkle {
+  from {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}

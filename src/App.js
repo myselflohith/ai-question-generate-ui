@@ -24,6 +24,7 @@ export default function ChapterViewer() {
   const [slider1, setSlider1] = useState(33);
   const [slider2, setSlider2] = useState(66);
   const [showPUC, setShowPUC] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   const handleSliderChange = (index, value) => {
     if (index === 1) {
@@ -42,9 +43,15 @@ export default function ChapterViewer() {
     return `Hard: ${hard}% | Medium: ${medium}% | Low: ${low}%`;
   };
 
+  const handleGenerate = () => {
+    setGenerating(true);
+    setTimeout(() => setGenerating(false), 2000);
+  };
+
   return (
     <div className="card-wrapper">
       <div className="card">
+        <div className={`card-content ${generating ? 'blur' : ''}`}>
         {/* Subject Tabs */}
         <div className="tabs">
           {subjects.map((subj, i) => (
@@ -138,7 +145,16 @@ export default function ChapterViewer() {
             </div>
           ))}
         </div>
+        <button
+          className="ai-generate-btn"
+          onClick={handleGenerate}
+          disabled={generating}
+        >
+          AI Generate
+        </button>
       </div>
+      {generating && <div className="sparkle-overlay">✨</div>}
     </div>
+  </div>
   );
 }
