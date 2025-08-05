@@ -31,6 +31,7 @@ test('selecting 1st PUC opens first chapter by default', () => {
   render(<App />);
   fireEvent.click(screen.getByText('Physics'));
   fireEvent.click(screen.getByText('1st PUC'));
-  const topics = screen.getByText('Motion and Laws').nextElementSibling;
+  const header = screen.getByText('Motion and Laws').parentElement;
+  const topics = header.nextElementSibling;
   expect(topics.classList.contains('show')).toBe(true);
 });

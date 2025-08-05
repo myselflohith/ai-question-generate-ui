@@ -166,7 +166,10 @@ export default function ChapterViewer() {
                 className="chapter-header"
                 onClick={() => setOpenChapter(openChapter === idx ? null : idx)}
               >
-                {ch.title}
+                <span>{ch.title}</span>
+                <span className="material-icons arrow-icon">
+                  {openChapter === idx ? 'expand_less' : 'expand_more'}
+                </span>
               </div>
               <div className={`topics ${openChapter === idx ? 'show' : ''}`}>
                 {ch.topics.map((topic, i) => (
