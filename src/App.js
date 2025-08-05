@@ -17,13 +17,26 @@ const chapters = [
   }
 ];
 
+const TOTAL_QUESTIONS = 10;
+
+const SparkleIcon = ({ className = '', size = 48 }) => (
+  <span className={`material-icons ${className}`} style={{ fontSize: size }}>
+    auto_awesome
+  </span>
+);
+
 export default function ChapterViewer() {
-  const [activeSubject, setActiveSubject] = useState(0);
-  const [puc, setPuc] = useState(null);
+  const [activeSubject, setActiveSubject] = useState(null);
+  const [pucs, setPucs] = useState([]);
   const [openChapter, setOpenChapter] = useState(null);
   const [slider1, setSlider1] = useState(33);
   const [slider2, setSlider2] = useState(66);
   const [showPUC, setShowPUC] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const initialCounts = subjects.map(() =>
+    chapters.map((ch) => ch.topics.map(() => 0))
+  );
+  const [topicCounts, setTopicCounts] = useState(initialCounts);
 
   const handleSliderChange = (index, value) => {
     if (index === 1) {
@@ -42,18 +55,42 @@ export default function ChapterViewer() {
     return `Hard: ${hard}% | Medium: ${medium}% | Low: ${low}%`;
   };
 
+  const handleGenerate = () => {
+    setGenerating(true);
+    setTimeout(() => setGenerating(false), 2000);
+  };
+
+  const handleTopicCountChange = (chIdx, topicIdx, value) => {
+    if (activeSubject === null) return;
+    setTopicCounts((prev) => {
+      const copy = prev.map((subj) => subj.map((ch) => [...ch]));
+      copy[activeSubject][chIdx][topicIdx] = value;
+      return copy;
+    });
+  };
+
+  const subjectTotals = topicCounts.map((subj) =>
+    subj.reduce((sum, ch) => sum + ch.reduce((s, t) => s + t, 0), 0)
+  );
+
+  const canGenerate = subjectTotals.every((total) => total === TOTAL_QUESTIONS);
+
   return (
     <div className="card-wrapper">
-      <div className="card">
+      <div className="card glass">
+        <div
+          className={`card-content ${generating ? 'blur' : ''}`}
+          data-testid="card-content"
+        >
         {/* Subject Tabs */}
         <div className="tabs">
           {subjects.map((subj, i) => (
             <div
               key={i}
-              className={`tab ${i === activeSubject ? 'active' : ''}`}
+              className={`tab glass ${i === activeSubject ? 'active' : ''}`}
               onClick={() => {
                 setActiveSubject(i);
-                setPuc(null);
+                setPucs([]);
                 setOpenChapter(null);
                 setShowPUC(true);
               }}
@@ -64,7 +101,11 @@ export default function ChapterViewer() {
         </div>
 
         {/* Difficulty Slider */}
-        <div id="difficulty-container" style={{ display: 'block' }}>
+        <div
+          className={`difficulty-container ${
+            activeSubject !== null ? 'show' : ''
+          }`}
+        >
           <div className="label-row">
             <span>Hard</span>
             <span>Medium</span>
@@ -100,9 +141,13 @@ export default function ChapterViewer() {
             {['1st PUC', '2nd PUC'].map((val, i) => (
               <div
                 key={i}
-                className={`puc-button ${puc === i ? 'active' : ''}`}
+                className={`puc-button glass ${pucs.includes(i) ? 'active' : ''}`}
                 onClick={() => {
-                  setPuc(i);
+                  setPucs((prev) =>
+                    prev.includes(i)
+                      ? prev.filter((idx) => idx !== i)
+                      : [...prev, i]
+                  );
                   setOpenChapter(null);
                 }}
               >
@@ -113,9 +158,9 @@ export default function ChapterViewer() {
         </div>
 
         {/* Chapter Accordion */}
-        <div className={`chapter-container ${puc !== null ? 'show' : ''}`}>
+        <div className={`chapter-container ${pucs.length > 0 ? 'show' : ''}`}>
           {chapters.map((ch, idx) => (
-            <div className="chapter" key={idx}>
+            <div className="chapter glass" key={idx}>
               <div
                 className="chapter-header"
                 onClick={() => setOpenChapter(openChapter === idx ? null : idx)}
@@ -128,9 +173,17 @@ export default function ChapterViewer() {
                     <span>{topic}</span>
                     <input
                       type="number"
-                      className="topic-input"
+                      className="topic-input glass"
                       min="0"
-                      defaultValue={0}
+                      max={TOTAL_QUESTIONS}
+                      value={
+                        activeSubject !== null
+                          ? topicCounts[activeSubject][idx][i]
+                          : 0
+                      }
+                      onChange={(e) =>
+                        handleTopicCountChange(idx, i, +e.target.value)
+                      }
                     />
                   </div>
                 ))}
@@ -138,7 +191,22 @@ export default function ChapterViewer() {
             </div>
           ))}
         </div>
+        {canGenerate && (
+          <button
+            className="ai-generate-btn glass"
+            onClick={handleGenerate}
+            disabled={generating}
+          >
+            <SparkleIcon className="btn-icon" size={20} /> AI Generate
+          </button>
+        )}
       </div>
+      {generating && (
+        <div className="sparkle-overlay" data-testid="sparkle-overlay">
+          <SparkleIcon className="sparkle-icon" size={48} />
+        </div>
+      )}
     </div>
+  </div>
   );
 }
