@@ -78,7 +78,10 @@ export default function ChapterViewer() {
   return (
     <div className="card-wrapper">
       <div className="card glass">
-        <div className={`card-content ${generating ? 'blur' : ''}`}>
+        <div
+          className={`card-content ${generating ? 'blur' : ''}`}
+          data-testid="card-content"
+        >
         {/* Subject Tabs */}
         <div className="tabs">
           {subjects.map((subj, i) => (
@@ -199,7 +202,7 @@ export default function ChapterViewer() {
         )}
       </div>
       {generating && (
-        <div className="sparkle-overlay">
+        <div className="sparkle-overlay" data-testid="sparkle-overlay">
           <SparkleIcon className="sparkle-icon" size={48} />
         </div>
       )}
