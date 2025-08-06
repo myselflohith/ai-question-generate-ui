@@ -1,7 +1,7 @@
 body {
       margin: 0;
-      padding: 0;
-      height: 100vh;
+      padding: 40px 0;
+      min-height: 100vh;
       background: linear-gradient(270deg, #a16ae8, #00c3ff, #ff6ec4);
       background-size: 600% 600%;
       animation: gradientShift 15s ease infinite;
@@ -9,6 +9,7 @@ body {
       justify-content: center;
       align-items: center;
       font-family: 'Segoe UI', sans-serif;
+      overflow-y: auto;
     }
 
     @keyframes gradientShift {
@@ -105,10 +106,17 @@ body {
       cursor: pointer;
       font-weight: 600;
       transition: background 0.3s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .chapter-header:hover {
       background: rgba(255, 255, 255, 0.2);
+    }
+
+    .chapter-header .arrow-icon {
+      font-size: 20px;
     }
 
     .topics {
@@ -227,17 +235,17 @@ body {
 }
 
 .ai-generate-btn {
-  margin-top: 20px;
-  width: 100%;
-  padding: 10px 16px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
 
 .ai-generate-btn:hover {
   background: rgba(255, 255, 255, 0.2);
