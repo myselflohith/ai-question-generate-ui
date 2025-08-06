@@ -58,10 +58,9 @@ body {
   }
 
   .chapter-buttons {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 12px;
-    grid-auto-flow: dense;
   }
 
   .tab, .puc-button, .chapter-button {
@@ -77,8 +76,8 @@ body {
   }
 
   .chapter-button {
-    width: 100%;
     text-align: center;
+    flex: 0 0 auto;
   }
 
     .tab.active, .puc-button.active, .chapter-button.active {
