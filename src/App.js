@@ -1,21 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ChapterViewer.css';
-
-const subjects = ['Physics', 'Chemistry', 'Mathematics'];
-const chapters = [
-  {
-    title: 'Motion and Laws',
-    topics: ["Newton's Laws", 'Inertia', 'Acceleration']
-  },
-  {
-    title: 'Work, Energy and Power',
-    topics: ['Kinetic Energy', 'Potential Energy', 'Conservation Laws']
-  },
-  {
-    title: 'Oscillations',
-    topics: ['Simple Harmonic Motion', 'Frequency & Amplitude', 'Damped Oscillations']
-  }
-];
+import { fetchYears, fetchSubjects, fetchChapters } from './api';
 
 const TOTAL_QUESTIONS = 10;
 
@@ -26,6 +11,10 @@ const SparkleIcon = ({ className = '', size = 48 }) => (
 );
 
 export default function ChapterViewer() {
+  const [subjects, setSubjects] = useState([]);
+  const [years, setYears] = useState([]);
+  const [chapters, setChapters] = useState([]);
+  const [chapterIndexMap, setChapterIndexMap] = useState({});
   const [activeSubject, setActiveSubject] = useState(null);
   const [pucs, setPucs] = useState([]);
   const [openChapter, setOpenChapter] = useState(null);
@@ -35,10 +24,33 @@ export default function ChapterViewer() {
   const [generating, setGenerating] = useState(false);
   const [selectedChapters, setSelectedChapters] = useState([]);
   const [showTopics, setShowTopics] = useState(false);
-  const initialCounts = subjects.map(() =>
-    chapters.map((ch) => ch.topics.map(() => 0))
-  );
-  const [topicCounts, setTopicCounts] = useState(initialCounts);
+  const [topicCounts, setTopicCounts] = useState([]);
+
+  useEffect(() => {
+    async function loadData() {
+      const [yearRes, subjRes, chapRes] = await Promise.all([
+        fetchYears(),
+        fetchSubjects(),
+        fetchChapters(),
+      ]);
+      const subjNames = subjRes.data.slice(0, 3).map((s) => s.subject_name);
+      setSubjects(subjNames);
+      setYears(yearRes.data);
+      const chaps = chapRes.data.map((ch) => ({
+        ...ch,
+        topics: ['Topic 1', 'Topic 2', 'Topic 3'],
+      }));
+      setChapters(chaps);
+      const indexMap = {};
+      chaps.forEach((ch, idx) => {
+        indexMap[ch.chapter_id] = idx;
+      });
+      setChapterIndexMap(indexMap);
+      const counts = subjNames.map(() => chaps.map(() => Array(3).fill(0)));
+      setTopicCounts(counts);
+    }
+    loadData();
+  }, []);
 
   const handleSliderChange = (index, value) => {
     if (index === 1) {
@@ -62,8 +74,9 @@ export default function ChapterViewer() {
     setTimeout(() => setGenerating(false), 2000);
   };
 
-  const handleTopicCountChange = (chIdx, topicIdx, value) => {
+  const handleTopicCountChange = (chapterId, topicIdx, value) => {
     if (activeSubject === null) return;
+    const chIdx = chapterIndexMap[chapterId];
     setTopicCounts((prev) => {
       const copy = prev.map((subj) => subj.map((ch) => [...ch]));
       copy[activeSubject][chIdx][topicIdx] = value;
@@ -139,48 +152,52 @@ export default function ChapterViewer() {
         {/* PUC Selection */}
         <div className={`puc-container ${showPUC ? 'show' : ''}`}>
           <div className="puc-buttons">
-              {['1st PUC', '2nd PUC'].map((val, i) => (
-                <div
-                  key={i}
-                  className={`puc-button ${pucs.includes(i) ? 'active' : ''}`}
-                  onClick={() => {
-                    setPucs((prev) =>
-                      prev.includes(i)
-                        ? prev.filter((idx) => idx !== i)
-                        : [...prev, i]
-                    );
-                    setSelectedChapters([]);
-                    setShowTopics(false);
-                    setOpenChapter(null);
-                  }}
-                >
-                  {val}
-                </div>
-              ))}
-            </div>
+            {years.map((year) => (
+              <div
+                key={year.year_id}
+                className={`puc-button ${
+                  pucs.includes(year.year_id) ? 'active' : ''
+                }`}
+                onClick={() => {
+                  setPucs((prev) =>
+                    prev.includes(year.year_id)
+                      ? prev.filter((id) => id !== year.year_id)
+                      : [...prev, year.year_id]
+                  );
+                  setSelectedChapters([]);
+                  setShowTopics(false);
+                  setOpenChapter(null);
+                }}
+              >
+                {year.year_name}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Chapter Selection */}
         {!showTopics && (
           <div className={`chapter-container ${pucs.length > 0 ? 'show' : ''}`}>
             <div className="chapter-buttons">
-              {chapters.map((ch, idx) => (
-                <div
-                  key={idx}
-                  className={`chapter-button ${
-                    selectedChapters.includes(idx) ? 'active' : ''
-                  }`}
-                  onClick={() =>
-                    setSelectedChapters((prev) =>
-                      prev.includes(idx)
-                        ? prev.filter((c) => c !== idx)
-                        : [...prev, idx]
-                    )
-                  }
-                >
-                  {ch.title}
-                </div>
-              ))}
+              {chapters
+                .filter((ch) => pucs.includes(ch.year_id))
+                .map((ch) => (
+                  <div
+                    key={ch.chapter_id}
+                    className={`chapter-button ${
+                      selectedChapters.includes(ch.chapter_id) ? 'active' : ''
+                    }`}
+                    onClick={() =>
+                      setSelectedChapters((prev) =>
+                        prev.includes(ch.chapter_id)
+                          ? prev.filter((c) => c !== ch.chapter_id)
+                          : [...prev, ch.chapter_id]
+                      )
+                    }
+                  >
+                    {ch.chapter_name}
+                  </div>
+                ))}
             </div>
             {selectedChapters.length > 0 && (
               <button
@@ -196,42 +213,46 @@ export default function ChapterViewer() {
         {/* Chapter Accordion */}
         {showTopics && (
           <div className={`chapter-container show`}>
-            {selectedChapters.map((idx) => (
-              <div className="chapter" key={idx}>
-                <div
-                  className="chapter-header"
-                  onClick={() =>
-                    setOpenChapter(openChapter === idx ? null : idx)
-                  }
-                >
-                  <span>{chapters[idx].title}</span>
-                  <span className="material-icons arrow-icon">
-                    {openChapter === idx ? 'expand_less' : 'expand_more'}
-                  </span>
+            {selectedChapters.map((id) => {
+              const chIdx = chapterIndexMap[id];
+              const chapter = chapters[chIdx];
+              return (
+                <div className="chapter" key={id}>
+                  <div
+                    className="chapter-header"
+                    onClick={() =>
+                      setOpenChapter(openChapter === id ? null : id)
+                    }
+                  >
+                    <span>{chapter.chapter_name}</span>
+                    <span className="material-icons arrow-icon">
+                      {openChapter === id ? 'expand_less' : 'expand_more'}
+                    </span>
+                  </div>
+                  <div className={`topics ${openChapter === id ? 'show' : ''}`}>
+                    {chapter.topics.map((topic, i) => (
+                      <div className="topic" key={i}>
+                        <span>{topic}</span>
+                        <input
+                          type="number"
+                          className="topic-input"
+                          min="0"
+                          max={TOTAL_QUESTIONS}
+                          value={
+                            activeSubject !== null
+                              ? topicCounts[activeSubject][chIdx][i]
+                              : 0
+                          }
+                          onChange={(e) =>
+                            handleTopicCountChange(id, i, +e.target.value)
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className={`topics ${openChapter === idx ? 'show' : ''}`}>
-                  {chapters[idx].topics.map((topic, i) => (
-                    <div className="topic" key={i}>
-                      <span>{topic}</span>
-                      <input
-                        type="number"
-                        className="topic-input"
-                        min="0"
-                        max={TOTAL_QUESTIONS}
-                        value={
-                          activeSubject !== null
-                            ? topicCounts[activeSubject][idx][i]
-                            : 0
-                        }
-                        onChange={(e) =>
-                          handleTopicCountChange(idx, i, +e.target.value)
-                        }
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
         {canGenerate && (
