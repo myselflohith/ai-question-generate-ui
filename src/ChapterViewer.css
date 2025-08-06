@@ -247,22 +247,27 @@ body {
   pointer-events: none;
 }
 
-.ai-generate-btn, .continue-btn {
-    margin-top: 20px;
-    width: 100%;
-    padding: 10px 16px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
 
-.ai-generate-btn:hover, .continue-btn:hover {
+ .ai-generate-btn, .continue-btn, .back-btn {
+     margin-top: 20px;
+     width: 100%;
+     padding: 10px 16px;
+     border-radius: 16px;
+     background: rgba(255, 255, 255, 0.1);
+     color: #fff;
+     border: 1px solid rgba(255, 255, 255, 0.3);
+     font-size: 16px;
+     cursor: pointer;
+     transition: all 0.3s ease;
+   }
+
+.ai-generate-btn:hover, .continue-btn:hover, .back-btn:hover {
   background: rgba(255, 255, 255, 0.2);
-}
+ }
+
+ .back-btn {
+   margin-bottom: 20px;
+ }
 .ai-generate-btn .btn-icon {
   margin-right: 8px;
   vertical-align: middle;

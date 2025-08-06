@@ -43,3 +43,19 @@ test('topics are hidden until chapter header is clicked', async () => {
   fireEvent.click(header);
   expect(topics.classList.contains('show')).toBe(true);
 });
+
+test('back button returns to chapter selection with previous choices active', async () => {
+  render(<App />);
+  fireEvent.click(await screen.findByText('PHYSICS'));
+  fireEvent.click(await screen.findByText('I PUC'));
+  fireEvent.click(await screen.findByText('Units and Measurements'));
+  fireEvent.click(screen.getByText('Continue'));
+  fireEvent.click(screen.getByText('Back'));
+  const first = screen.getByText('Units and Measurements');
+  expect(first.classList.contains('active')).toBe(true);
+  fireEvent.click(screen.getByText('Motion in a Straight Line'));
+  fireEvent.click(screen.getByText('Continue'));
+  expect(screen.getByText('Units and Measurements')).toBeInTheDocument();
+  expect(screen.getByText('Motion in a Straight Line')).toBeInTheDocument();
+});
+

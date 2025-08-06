@@ -213,6 +213,15 @@ export default function ChapterViewer() {
         {/* Chapter Accordion */}
         {showTopics && (
           <div className={`chapter-container show`}>
+            <button
+              className="back-btn"
+              onClick={() => {
+                setShowTopics(false);
+                setOpenChapter(null);
+              }}
+            >
+              Back
+            </button>
             {selectedChapters.map((id) => {
               const chIdx = chapterIndexMap[id];
               const chapter = chapters[chIdx];
