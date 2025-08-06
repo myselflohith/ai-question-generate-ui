@@ -10,14 +10,25 @@ test('AI Generate button appears after all subjects reach 10 questions', async (
     fireEvent.click(await screen.findByText('I PUC'));
     fireEvent.click(await screen.findByText('Units and Measurements'));
     fireEvent.click(screen.getByText('Continue'));
-    fireEvent.click(screen.getByText('Units and Measurements'));
-    const input = screen.getAllByRole('spinbutton')[0];
-    fireEvent.change(input, { target: { value: '10' } });
     if (idx < subjects.length - 1) {
       expect(screen.queryByText(/AI Generate/i)).toBeNull();
     }
   }
   expect(screen.getByText(/AI Generate/i)).toBeInTheDocument();
+});
+
+test('topics default to a total of 10 questions', async () => {
+  jest.spyOn(Math, 'random').mockReturnValue(0);
+  render(<App />);
+  fireEvent.click(await screen.findByText('PHYSICS'));
+  fireEvent.click(await screen.findByText('I PUC'));
+  fireEvent.click(await screen.findByText('Units and Measurements'));
+  fireEvent.click(screen.getByText('Continue'));
+  fireEvent.click(screen.getByText('Units and Measurements'));
+  const inputs = screen.getAllByRole('spinbutton');
+  const total = inputs.reduce((sum, input) => sum + Number(input.value), 0);
+  expect(total).toBe(10);
+  Math.random.mockRestore();
 });
 
 test('allows selecting both PUC options', async () => {

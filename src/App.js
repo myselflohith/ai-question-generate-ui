@@ -84,6 +84,33 @@ export default function ChapterViewer() {
     });
   };
 
+  const handleContinue = () => {
+    setShowTopics(true);
+    if (activeSubject === null) return;
+    setTopicCounts((prev) => {
+      const copy = prev.map((subj) => subj.map((ch) => [...ch]));
+      copy[activeSubject] = chapters.map((ch) =>
+        Array(ch.topics.length).fill(0)
+      );
+      const topicRefs = [];
+      selectedChapters.forEach((id) => {
+        const chIdx = chapterIndexMap[id];
+        const topicLen = chapters[chIdx].topics.length;
+        for (let i = 0; i < topicLen; i++) {
+          topicRefs.push([chIdx, i]);
+        }
+      });
+      let remaining = TOTAL_QUESTIONS;
+      while (remaining > 0 && topicRefs.length > 0) {
+        const idx = Math.floor(Math.random() * topicRefs.length);
+        const [chIdx, tIdx] = topicRefs[idx];
+        copy[activeSubject][chIdx][tIdx] += 1;
+        remaining--;
+      }
+      return copy;
+    });
+  };
+
   const subjectTotals = topicCounts.map((subj) =>
     subj.reduce((sum, ch) => sum + ch.reduce((s, t) => s + t, 0), 0)
   );
@@ -200,10 +227,7 @@ export default function ChapterViewer() {
                 ))}
             </div>
             {selectedChapters.length > 0 && (
-              <button
-                className="continue-btn"
-                onClick={() => setShowTopics(true)}
-              >
+              <button className="continue-btn" onClick={handleContinue}>
                 Continue
               </button>
             )}
