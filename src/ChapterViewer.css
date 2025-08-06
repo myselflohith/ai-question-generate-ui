@@ -49,13 +49,17 @@ body {
       color: #fff;
     }
 
-    .tabs, .puc-buttons {
+    .tabs, .puc-buttons, .chapter-buttons {
       display: flex;
       gap: 12px;
       justify-content: center;
     }
 
-    .tab, .puc-button {
+    .chapter-buttons {
+      flex-wrap: wrap;
+    }
+
+    .tab, .puc-button, .chapter-button {
       padding: 8px 16px;
       border-radius: 16px;
       background: rgba(255, 255, 255, 0.1);
@@ -67,7 +71,7 @@ body {
       font-size: 14px;
     }
 
-    .tab.active, .puc-button.active {
+    .tab.active, .puc-button.active, .chapter-button.active {
       background: rgba(255, 255, 255, 0.3);
       box-shadow: 0 0 8px rgba(255, 255, 255, 0.3),
                   0 0 16px rgba(255, 255, 255, 0.15);
@@ -234,7 +238,7 @@ body {
   pointer-events: none;
 }
 
-.ai-generate-btn {
+.ai-generate-btn, .continue-btn {
     margin-top: 20px;
     width: 100%;
     padding: 10px 16px;
@@ -247,7 +251,7 @@ body {
     transition: all 0.3s ease;
   }
 
-.ai-generate-btn:hover {
+.ai-generate-btn:hover, .continue-btn:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 .ai-generate-btn .btn-icon {
