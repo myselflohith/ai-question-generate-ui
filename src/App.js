@@ -1,21 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ChapterViewer.css';
-
-const subjects = ['Physics', 'Chemistry', 'Mathematics'];
-const chapters = [
-  {
-    title: 'Motion and Laws',
-    topics: ["Newton's Laws", 'Inertia', 'Acceleration']
-  },
-  {
-    title: 'Work, Energy and Power',
-    topics: ['Kinetic Energy', 'Potential Energy', 'Conservation Laws']
-  },
-  {
-    title: 'Oscillations',
-    topics: ['Simple Harmonic Motion', 'Frequency & Amplitude', 'Damped Oscillations']
-  }
-];
+import { fetchYears, fetchSubjects, fetchChapters } from './api';
 
 const TOTAL_QUESTIONS = 10;
 
@@ -26,6 +11,10 @@ const SparkleIcon = ({ className = '', size = 48 }) => (
 );
 
 export default function ChapterViewer() {
+  const [subjects, setSubjects] = useState([]);
+  const [years, setYears] = useState([]);
+  const [chapters, setChapters] = useState([]);
+  const [chapterIndexMap, setChapterIndexMap] = useState({});
   const [activeSubject, setActiveSubject] = useState(null);
   const [pucs, setPucs] = useState([]);
   const [openChapter, setOpenChapter] = useState(null);
@@ -33,10 +22,35 @@ export default function ChapterViewer() {
   const [slider2, setSlider2] = useState(66);
   const [showPUC, setShowPUC] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const initialCounts = subjects.map(() =>
-    chapters.map((ch) => ch.topics.map(() => 0))
-  );
-  const [topicCounts, setTopicCounts] = useState(initialCounts);
+  const [selectedChapters, setSelectedChapters] = useState([]);
+  const [showTopics, setShowTopics] = useState(false);
+  const [topicCounts, setTopicCounts] = useState([]);
+
+  useEffect(() => {
+    async function loadData() {
+      const [yearRes, subjRes, chapRes] = await Promise.all([
+        fetchYears(),
+        fetchSubjects(),
+        fetchChapters(),
+      ]);
+      const subjNames = subjRes.data.slice(0, 3).map((s) => s.subject_name);
+      setSubjects(subjNames);
+      setYears(yearRes.data);
+      const chaps = chapRes.data.map((ch) => ({
+        ...ch,
+        topics: ['Topic 1', 'Topic 2', 'Topic 3'],
+      }));
+      setChapters(chaps);
+      const indexMap = {};
+      chaps.forEach((ch, idx) => {
+        indexMap[ch.chapter_id] = idx;
+      });
+      setChapterIndexMap(indexMap);
+      const counts = subjNames.map(() => chaps.map(() => Array(3).fill(0)));
+      setTopicCounts(counts);
+    }
+    loadData();
+  }, []);
 
   const handleSliderChange = (index, value) => {
     if (index === 1) {
@@ -52,7 +66,7 @@ export default function ChapterViewer() {
     const hard = slider1;
     const medium = slider2 - slider1;
     const low = 100 - slider2;
-    return `Hard: ${hard}% | Medium: ${medium}% | Low: ${low}%`;
+    return `Hard: ${hard}% Medium: ${medium}% Low: ${low}%`;
   };
 
   const handleGenerate = () => {
@@ -60,11 +74,39 @@ export default function ChapterViewer() {
     setTimeout(() => setGenerating(false), 2000);
   };
 
-  const handleTopicCountChange = (chIdx, topicIdx, value) => {
+  const handleTopicCountChange = (chapterId, topicIdx, value) => {
     if (activeSubject === null) return;
+    const chIdx = chapterIndexMap[chapterId];
     setTopicCounts((prev) => {
       const copy = prev.map((subj) => subj.map((ch) => [...ch]));
       copy[activeSubject][chIdx][topicIdx] = value;
+      return copy;
+    });
+  };
+
+  const handleContinue = () => {
+    setShowTopics(true);
+    if (activeSubject === null) return;
+    setTopicCounts((prev) => {
+      const copy = prev.map((subj) => subj.map((ch) => [...ch]));
+      copy[activeSubject] = chapters.map((ch) =>
+        Array(ch.topics.length).fill(0)
+      );
+      const topicRefs = [];
+      selectedChapters.forEach((id) => {
+        const chIdx = chapterIndexMap[id];
+        const topicLen = chapters[chIdx].topics.length;
+        for (let i = 0; i < topicLen; i++) {
+          topicRefs.push([chIdx, i]);
+        }
+      });
+      let remaining = TOTAL_QUESTIONS;
+      while (remaining > 0 && topicRefs.length > 0) {
+        const idx = Math.floor(Math.random() * topicRefs.length);
+        const [chIdx, tIdx] = topicRefs[idx];
+        copy[activeSubject][chIdx][tIdx] += 1;
+        remaining--;
+      }
       return copy;
     });
   };
@@ -89,6 +131,8 @@ export default function ChapterViewer() {
                 setActiveSubject(i);
                 setPucs([]);
                 setOpenChapter(null);
+                setSelectedChapters([]);
+                setShowTopics(false);
                 setShowPUC(true);
               }}
             >
@@ -135,65 +179,114 @@ export default function ChapterViewer() {
         {/* PUC Selection */}
         <div className={`puc-container ${showPUC ? 'show' : ''}`}>
           <div className="puc-buttons">
-              {['1st PUC', '2nd PUC'].map((val, i) => (
+            {years.map((year) => (
+              <div
+                key={year.year_id}
+                className={`puc-button ${
+                  pucs.includes(year.year_id) ? 'active' : ''
+                }`}
+                onClick={() => {
+                  setPucs((prev) =>
+                    prev.includes(year.year_id)
+                      ? prev.filter((id) => id !== year.year_id)
+                      : [...prev, year.year_id]
+                  );
+                  setSelectedChapters([]);
+                  setShowTopics(false);
+                  setOpenChapter(null);
+                }}
+              >
+                {year.year_name}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Chapter Selection */}
+        <div
+          className={`chapter-container ${
+            !showTopics && pucs.length > 0 ? 'show' : ''
+          }`}
+        >
+          <div className="chapter-buttons">
+            {chapters
+              .filter((ch) => pucs.includes(ch.year_id))
+              .map((ch) => (
                 <div
-                  key={i}
-                  className={`puc-button ${pucs.includes(i) ? 'active' : ''}`}
-                  onClick={() => {
-                    setPucs((prev) => {
-                      const isActive = prev.includes(i);
-                      const updated = isActive
-                        ? prev.filter((idx) => idx !== i)
-                        : [...prev, i];
-                      if (i === 0) {
-                        setOpenChapter(isActive ? null : 0);
-                      }
-                      return updated;
-                    });
-                  }}
+                  key={ch.chapter_id}
+                  className={`chapter-button ${
+                    selectedChapters.includes(ch.chapter_id) ? 'active' : ''
+                  }`}
+                  onClick={() =>
+                    setSelectedChapters((prev) =>
+                      prev.includes(ch.chapter_id)
+                        ? prev.filter((c) => c !== ch.chapter_id)
+                        : [...prev, ch.chapter_id]
+                    )
+                  }
                 >
-                  {val}
+                  {ch.chapter_name}
                 </div>
               ))}
-            </div>
+          </div>
+          {selectedChapters.length > 0 && (
+            <button className="continue-btn" onClick={handleContinue}>
+              Continue
+            </button>
+          )}
         </div>
 
         {/* Chapter Accordion */}
-        <div className={`chapter-container ${pucs.length > 0 ? 'show' : ''}`}>
-          {chapters.map((ch, idx) => (
-            <div className="chapter" key={idx}>
-              <div
-                className="chapter-header"
-                onClick={() => setOpenChapter(openChapter === idx ? null : idx)}
-              >
-                <span>{ch.title}</span>
-                <span className="material-icons arrow-icon">
-                  {openChapter === idx ? 'expand_less' : 'expand_more'}
-                </span>
+        <div className={`chapter-container ${showTopics ? 'show' : ''}`}>
+          <button
+            className="back-btn"
+            onClick={() => {
+              setShowTopics(false);
+              setOpenChapter(null);
+            }}
+          >
+            Back
+          </button>
+          {selectedChapters.map((id) => {
+            const chIdx = chapterIndexMap[id];
+            const chapter = chapters[chIdx];
+            return (
+              <div className="chapter" key={id}>
+                <div
+                  className="chapter-header"
+                  onClick={() =>
+                    setOpenChapter(openChapter === id ? null : id)
+                  }
+                >
+                  <span>{chapter.chapter_name}</span>
+                  <span className="material-icons arrow-icon">
+                    {openChapter === id ? 'expand_less' : 'expand_more'}
+                  </span>
+                </div>
+                <div className={`topics ${openChapter === id ? 'show' : ''}`}>
+                  {chapter.topics.map((topic, i) => (
+                    <div className="topic" key={i}>
+                      <span>{topic}</span>
+                      <input
+                        type="number"
+                        className="topic-input"
+                        min="0"
+                        max={TOTAL_QUESTIONS}
+                        value={
+                          activeSubject !== null
+                            ? topicCounts[activeSubject][chIdx][i]
+                            : 0
+                        }
+                        onChange={(e) =>
+                          handleTopicCountChange(id, i, +e.target.value)
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className={`topics ${openChapter === idx ? 'show' : ''}`}>
-                {ch.topics.map((topic, i) => (
-                  <div className="topic" key={i}>
-                    <span>{topic}</span>
-                    <input
-                      type="number"
-                      className="topic-input"
-                      min="0"
-                      max={TOTAL_QUESTIONS}
-                      value={
-                        activeSubject !== null
-                          ? topicCounts[activeSubject][idx][i]
-                          : 0
-                      }
-                      onChange={(e) =>
-                        handleTopicCountChange(idx, i, +e.target.value)
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         {canGenerate && (
           <button

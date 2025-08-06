@@ -18,12 +18,14 @@ body {
       100% { background-position: 0% 50%; }
     }
 
-    .card-wrapper {
-      position: relative;
-      width: 420px;
-      padding: 2px;
-      border-radius: 24px;
-    }
+  .card-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2px;
+    border-radius: 24px;
+  }
 
     .card-wrapper::before {
       content: '';
@@ -49,25 +51,36 @@ body {
       color: #fff;
     }
 
-    .tabs, .puc-buttons {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
+  .tabs, .puc-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
 
-    .tab, .puc-button {
-      padding: 8px 16px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.4s ease;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      font-size: 14px;
-    }
+  .chapter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
 
-    .tab.active, .puc-button.active {
+  .tab, .puc-button, .chapter-button {
+    padding: 8px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 14px;
+  }
+
+  .chapter-button {
+    text-align: center;
+    flex: 0 0 auto;
+  }
+
+    .tab.active, .puc-button.active, .chapter-button.active {
       background: rgba(255, 255, 255, 0.3);
       box-shadow: 0 0 8px rgba(255, 255, 255, 0.3),
                   0 0 16px rgba(255, 255, 255, 0.15);
@@ -83,6 +96,7 @@ body {
       opacity: 0;
       transform: translateY(-10px);
       transition: all 0.7s ease-in-out;
+      pointer-events: none;
     }
 
     .difficulty-container.show,
@@ -92,6 +106,7 @@ body {
       opacity: 1;
       transform: translateY(0);
       margin-top: 20px;
+      pointer-events: auto;
     }
 
     .chapter {
@@ -234,22 +249,27 @@ body {
   pointer-events: none;
 }
 
-.ai-generate-btn {
-    margin-top: 20px;
-    width: 100%;
-    padding: 10px 16px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
 
-.ai-generate-btn:hover {
+ .ai-generate-btn, .continue-btn, .back-btn {
+     margin-top: 20px;
+     width: 100%;
+     padding: 10px 16px;
+     border-radius: 16px;
+     background: rgba(255, 255, 255, 0.1);
+     color: #fff;
+     border: 1px solid rgba(255, 255, 255, 0.3);
+     font-size: 16px;
+     cursor: pointer;
+     transition: all 0.3s ease;
+   }
+
+.ai-generate-btn:hover, .continue-btn:hover, .back-btn:hover {
   background: rgba(255, 255, 255, 0.2);
-}
+ }
+
+ .back-btn {
+   margin-bottom: 20px;
+ }
 .ai-generate-btn .btn-icon {
   margin-right: 8px;
   vertical-align: middle;
