@@ -66,7 +66,7 @@ export default function ChapterViewer() {
     const hard = slider1;
     const medium = slider2 - slider1;
     const low = 100 - slider2;
-    return `Hard: ${hard}% | Medium: ${medium}% | Low: ${low}%`;
+    return `Hard: ${hard}% Medium: ${medium}% Low: ${low}%`;
   };
 
   const handleGenerate = () => {
