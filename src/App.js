@@ -203,91 +203,91 @@ export default function ChapterViewer() {
         </div>
 
         {/* Chapter Selection */}
-        {!showTopics && (
-          <div className={`chapter-container ${pucs.length > 0 ? 'show' : ''}`}>
-            <div className="chapter-buttons">
-              {chapters
-                .filter((ch) => pucs.includes(ch.year_id))
-                .map((ch) => (
-                  <div
-                    key={ch.chapter_id}
-                    className={`chapter-button ${
-                      selectedChapters.includes(ch.chapter_id) ? 'active' : ''
-                    }`}
-                    onClick={() =>
-                      setSelectedChapters((prev) =>
-                        prev.includes(ch.chapter_id)
-                          ? prev.filter((c) => c !== ch.chapter_id)
-                          : [...prev, ch.chapter_id]
-                      )
-                    }
-                  >
-                    {ch.chapter_name}
-                  </div>
-                ))}
-            </div>
-            {selectedChapters.length > 0 && (
-              <button className="continue-btn" onClick={handleContinue}>
-                Continue
-              </button>
-            )}
+        <div
+          className={`chapter-container ${
+            !showTopics && pucs.length > 0 ? 'show' : ''
+          }`}
+        >
+          <div className="chapter-buttons">
+            {chapters
+              .filter((ch) => pucs.includes(ch.year_id))
+              .map((ch) => (
+                <div
+                  key={ch.chapter_id}
+                  className={`chapter-button ${
+                    selectedChapters.includes(ch.chapter_id) ? 'active' : ''
+                  }`}
+                  onClick={() =>
+                    setSelectedChapters((prev) =>
+                      prev.includes(ch.chapter_id)
+                        ? prev.filter((c) => c !== ch.chapter_id)
+                        : [...prev, ch.chapter_id]
+                    )
+                  }
+                >
+                  {ch.chapter_name}
+                </div>
+              ))}
           </div>
-        )}
+          {selectedChapters.length > 0 && (
+            <button className="continue-btn" onClick={handleContinue}>
+              Continue
+            </button>
+          )}
+        </div>
 
         {/* Chapter Accordion */}
-        {showTopics && (
-          <div className={`chapter-container show`}>
-            <button
-              className="back-btn"
-              onClick={() => {
-                setShowTopics(false);
-                setOpenChapter(null);
-              }}
-            >
-              Back
-            </button>
-            {selectedChapters.map((id) => {
-              const chIdx = chapterIndexMap[id];
-              const chapter = chapters[chIdx];
-              return (
-                <div className="chapter" key={id}>
-                  <div
-                    className="chapter-header"
-                    onClick={() =>
-                      setOpenChapter(openChapter === id ? null : id)
-                    }
-                  >
-                    <span>{chapter.chapter_name}</span>
-                    <span className="material-icons arrow-icon">
-                      {openChapter === id ? 'expand_less' : 'expand_more'}
-                    </span>
-                  </div>
-                  <div className={`topics ${openChapter === id ? 'show' : ''}`}>
-                    {chapter.topics.map((topic, i) => (
-                      <div className="topic" key={i}>
-                        <span>{topic}</span>
-                        <input
-                          type="number"
-                          className="topic-input"
-                          min="0"
-                          max={TOTAL_QUESTIONS}
-                          value={
-                            activeSubject !== null
-                              ? topicCounts[activeSubject][chIdx][i]
-                              : 0
-                          }
-                          onChange={(e) =>
-                            handleTopicCountChange(id, i, +e.target.value)
-                          }
-                        />
-                      </div>
-                    ))}
-                  </div>
+        <div className={`chapter-container ${showTopics ? 'show' : ''}`}>
+          <button
+            className="back-btn"
+            onClick={() => {
+              setShowTopics(false);
+              setOpenChapter(null);
+            }}
+          >
+            Back
+          </button>
+          {selectedChapters.map((id) => {
+            const chIdx = chapterIndexMap[id];
+            const chapter = chapters[chIdx];
+            return (
+              <div className="chapter" key={id}>
+                <div
+                  className="chapter-header"
+                  onClick={() =>
+                    setOpenChapter(openChapter === id ? null : id)
+                  }
+                >
+                  <span>{chapter.chapter_name}</span>
+                  <span className="material-icons arrow-icon">
+                    {openChapter === id ? 'expand_less' : 'expand_more'}
+                  </span>
                 </div>
-              );
-            })}
-          </div>
-        )}
+                <div className={`topics ${openChapter === id ? 'show' : ''}`}>
+                  {chapter.topics.map((topic, i) => (
+                    <div className="topic" key={i}>
+                      <span>{topic}</span>
+                      <input
+                        type="number"
+                        className="topic-input"
+                        min="0"
+                        max={TOTAL_QUESTIONS}
+                        value={
+                          activeSubject !== null
+                            ? topicCounts[activeSubject][chIdx][i]
+                            : 0
+                        }
+                        onChange={(e) =>
+                          handleTopicCountChange(id, i, +e.target.value)
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
         {canGenerate && (
           <button
             className="ai-generate-btn"

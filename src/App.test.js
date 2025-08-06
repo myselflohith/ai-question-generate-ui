@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import App from './App';
 
 test('AI Generate button appears after all subjects reach 10 questions', async () => {
@@ -24,8 +24,11 @@ test('topics default to a total of 10 questions', async () => {
   fireEvent.click(await screen.findByText('I PUC'));
   fireEvent.click(await screen.findByText('Units and Measurements'));
   fireEvent.click(screen.getByText('Continue'));
-  fireEvent.click(screen.getByText('Units and Measurements'));
-  const inputs = screen.getAllByRole('spinbutton');
+  const topicsContainer = screen.getByText('Back').parentElement;
+  fireEvent.click(
+    within(topicsContainer).getByText('Units and Measurements')
+  );
+  const inputs = within(topicsContainer).getAllByRole('spinbutton');
   const total = inputs.reduce((sum, input) => sum + Number(input.value), 0);
   expect(total).toBe(10);
   Math.random.mockRestore();
@@ -48,7 +51,10 @@ test('topics are hidden until chapter header is clicked', async () => {
   fireEvent.click(await screen.findByText('I PUC'));
   fireEvent.click(await screen.findByText('Units and Measurements'));
   fireEvent.click(screen.getByText('Continue'));
-  const header = screen.getByText('Units and Measurements').parentElement;
+  const topicsContainer = screen.getByText('Back').parentElement;
+  const header = within(topicsContainer)
+    .getByText('Units and Measurements')
+    .parentElement;
   const topics = header.nextElementSibling;
   expect(topics.classList.contains('show')).toBe(false);
   fireEvent.click(header);
@@ -62,11 +68,21 @@ test('back button returns to chapter selection with previous choices active', as
   fireEvent.click(await screen.findByText('Units and Measurements'));
   fireEvent.click(screen.getByText('Continue'));
   fireEvent.click(screen.getByText('Back'));
-  const first = screen.getByText('Units and Measurements');
+  const selectContainer = screen
+    .getByText('Continue')
+    .closest('.chapter-container');
+  const first = within(selectContainer).getByText('Units and Measurements');
   expect(first.classList.contains('active')).toBe(true);
-  fireEvent.click(screen.getByText('Motion in a Straight Line'));
+  fireEvent.click(
+    within(selectContainer).getByText('Motion in a Straight Line')
+  );
   fireEvent.click(screen.getByText('Continue'));
-  expect(screen.getByText('Units and Measurements')).toBeInTheDocument();
-  expect(screen.getByText('Motion in a Straight Line')).toBeInTheDocument();
+  const topicsContainer = screen.getByText('Back').parentElement;
+  expect(
+    within(topicsContainer).getByText('Units and Measurements')
+  ).toBeInTheDocument();
+  expect(
+    within(topicsContainer).getByText('Motion in a Straight Line')
+  ).toBeInTheDocument();
 });
 
