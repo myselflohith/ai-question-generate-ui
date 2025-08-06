@@ -18,12 +18,14 @@ body {
       100% { background-position: 0% 50%; }
     }
 
-    .card-wrapper {
-      position: relative;
-      width: 420px;
-      padding: 2px;
-      border-radius: 24px;
-    }
+  .card-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2px;
+    border-radius: 24px;
+  }
 
     .card-wrapper::before {
       content: '';
@@ -49,27 +51,35 @@ body {
       color: #fff;
     }
 
-    .tabs, .puc-buttons, .chapter-buttons {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
+  .tabs, .puc-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
 
-    .chapter-buttons {
-      flex-wrap: wrap;
-    }
+  .chapter-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    grid-auto-flow: dense;
+  }
 
-    .tab, .puc-button, .chapter-button {
-      padding: 8px 16px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.4s ease;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      font-size: 14px;
-    }
+  .tab, .puc-button, .chapter-button {
+    padding: 8px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 14px;
+  }
+
+  .chapter-button {
+    width: 100%;
+    text-align: center;
+  }
 
     .tab.active, .puc-button.active, .chapter-button.active {
       background: rgba(255, 255, 255, 0.3);
